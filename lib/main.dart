@@ -56,7 +56,26 @@ class _BlackjackHomeState extends State<BlackjackHome> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Expanded(child: PlayingCardView(card: PlayingCard(suit, value))),
+            Row(children: [
+              Expanded(
+                child: SizedBox(
+                  height: 150.0,
+                  child: ListView(scrollDirection: Axis.horizontal, children: [
+                    for (Suit cardSuit in Suit.values)
+                      for (CardValue cardValue in CardValue.values)
+                        SizedBox(
+                            width: 100.0,
+                            height: 150.0,
+                            child: PlayingCardView(
+                                card: PlayingCard(cardSuit, cardValue))),
+                    SizedBox(
+                        width: 100.0,
+                        height: 150.0,
+                        child: PlayingCardView(card: PlayingCard(suit, value))),
+                  ]),
+                ),
+              ),
+            ]),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
