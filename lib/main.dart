@@ -45,8 +45,7 @@ class BlackjackHome extends StatefulWidget {
 }
 
 class _BlackjackHomeState extends State<BlackjackHome> {
-  Suit suit = Suit.spades;
-  CardValue value = CardValue.ace;
+  List<PlayingCard> deck = standardFiftyTwoCardDeck();
 
   @override
   Widget build(BuildContext context) {
@@ -58,45 +57,21 @@ class _BlackjackHomeState extends State<BlackjackHome> {
           children: [
             Row(children: [
               Expanded(
-                child: SizedBox(
-                  height: 150.0,
-                  child: ListView(scrollDirection: Axis.horizontal, children: [
-                    for (Suit cardSuit in Suit.values)
-                      for (CardValue cardValue in CardValue.values)
-                        SizedBox(
+                  child: SizedBox(
+                height: 150.0,
+                child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: deck
+                        .map(
+                          (card) => SizedBox(
                             width: 100.0,
                             height: 150.0,
-                            child: PlayingCardView(
-                                card: PlayingCard(cardSuit, cardValue))),
-                    SizedBox(
-                        width: 100.0,
-                        height: 150.0,
-                        child: PlayingCardView(card: PlayingCard(suit, value))),
-                  ]),
-                ),
-              ),
-            ]),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                DropdownButton<Suit>(
-                    value: suit,
-                    items: Suit.values
-                        .map(
-                          (s) => DropdownMenuItem(
-                              value: s,
-                              child: Text(
-                                s.toString(),
-                              )),
+                            child: PlayingCardView(card: card),
+                          ),
                         )
-                        .toList(),
-                    onChanged: (val) {
-                      setState(() {
-                        suit = val!;
-                      });
-                    })
-              ],
-            )
+                        .toList()),
+              )),
+            ]),
           ],
         ),
       ));
