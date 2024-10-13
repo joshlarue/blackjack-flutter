@@ -1,71 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:playing_cards/playing_cards.dart';
 import 'package:provider/provider.dart';
+import 'deck.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
     create: (context) => Deck(),
     child: const MyApp(),
   ));
-}
-
-class Deck extends ChangeNotifier {
-  List<PlayingCard> _deck;
-  List<PlayingCard> dealerHand = [];
-  List<PlayingCard> playerHand = [];
-
-  Deck() : _deck = _createAndShuffleDeck();
-
-  void resetDeckAndHands() {
-    _deck = [];
-    playerHand = [];
-    dealerHand = [];
-    _deck = _createAndShuffleDeck();
-    notifyListeners();
-  }
-
-  static List<PlayingCard> _createAndShuffleDeck() {
-    List<PlayingCard> deck = standardFiftyTwoCardDeck();
-    deck.shuffle();
-    return deck;
-  }
-
-  List<PlayingCard> getDeck() {
-    return _deck;
-  }
-
-  List<PlayingCard> getDealerHand() {
-    return dealerHand;
-  }
-
-  List<PlayingCard> getPlayerHand() {
-    return playerHand;
-  }
-
-  void shuffleDeck() {
-    _deck.shuffle();
-    notifyListeners();
-  }
-
-  void drawForDealer() {
-    if (_deck.isNotEmpty) {
-      PlayingCard poppedCard = _deck.removeLast();
-      notifyListeners();
-      dealerHand.add(poppedCard);
-    } else {
-      throw Exception("There are no cards in the deck to draw.");
-    }
-  }
-
-  void drawForPlayer() {
-    if (_deck.isNotEmpty) {
-      PlayingCard poppedCard = _deck.removeLast();
-      notifyListeners();
-      playerHand.add(poppedCard);
-    } else {
-      throw Exception("There are no cards in the deck to draw.");
-    }
-  }
 }
 
 class MyApp extends StatelessWidget {
@@ -92,7 +34,7 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
         useMaterial3: true,
       ),
       home: const BlackjackHome(),
