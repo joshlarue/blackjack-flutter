@@ -16,6 +16,16 @@ class Deck extends ChangeNotifier {
     notifyListeners();
   }
 
+  void populateInitialHands() {
+    for (int i = 0; i < 3; i++) {
+      drawForDealer();
+    }
+
+    for (int i = 0; i < 2; i++) {
+      drawForPlayer();
+    }
+  }
+
   static List<PlayingCard> _createAndShuffleDeck() {
     List<PlayingCard> deck = standardFiftyTwoCardDeck();
     deck.shuffle();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:playing_cards/playing_cards.dart';
 import 'package:provider/provider.dart';
 import 'deck.dart';
+import 'package:collection/collection.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
@@ -34,6 +35,10 @@ class BlackjackHome extends StatefulWidget {
 }
 
 class _BlackjackHomeState extends State<BlackjackHome> {
+  ShapeBorder shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+      side: BorderSide(color: Colors.black, width: 1));
+
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
@@ -50,40 +55,43 @@ class _BlackjackHomeState extends State<BlackjackHome> {
                 height: 150.0,
                 child: Consumer<Deck>(builder: (context, deck, child) {
                   return ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: deck
-                          .getPlayerHand()
-                          .map(
-                            (card) => SizedBox(
-                              width: 100.0,
-                              height: 150.0,
-                              child: PlayingCardView(card: card),
-                            ),
-                          )
-                          .toList());
+                    scrollDirection: Axis.horizontal,
+                    children: deck
+                        .getPlayerHand()
+                        .map(
+                          (card) => PlayingCardView(
+                            card: card,
+                            shape: shape,
+                            elevation: 3,
+                          ),
+                        )
+                        .toList(),
+                  );
                 }),
               )),
             ]),
             Text("Dealer hand"),
             Row(children: [
-              Expanded(
-                  child: SizedBox(
+              SizedBox(
                 height: 150.0,
+                width: 150,
                 child: Consumer<Deck>(builder: (context, deck, child) {
-                  return ListView(
-                      scrollDirection: Axis.horizontal,
+                  return FlatCardFan(
                       children: deck
                           .getDealerHand()
-                          .map(
-                            (card) => SizedBox(
-                              width: 100.0,
-                              height: 150.0,
-                              child: PlayingCardView(card: card),
+                          .mapIndexed(
+                            (index, card) => PlayingCardView(
+                              card: card,
+                              showBack: index == deck.getDealerHand().length - 1
+                                  ? false
+                                  : true,
+                              shape: shape,
+                              elevation: 3.0,
                             ),
                           )
                           .toList());
                 }),
-              )),
+              ),
             ]),
             Consumer<Deck>(builder: (context, deck, child) {
               return TextButton(
@@ -97,6 +105,14 @@ class _BlackjackHomeState extends State<BlackjackHome> {
                   child: Text('Reset Deck'),
                   onPressed: () {
                     deck.resetDeckAndHands();
+                  });
+            }),
+            Consumer<Deck>(builder: (context, deck, child) {
+              return TextButton(
+                  child: Text('New Game'),
+                  onPressed: () {
+                    deck.resetDeckAndHands();
+                    deck.populateInitialHands();
                   });
             }),
           ],
