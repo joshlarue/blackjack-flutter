@@ -1,8 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:playing_cards/playing_cards.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => Deck(),
+    child: const MyApp(),
+  ));
+}
+
+class Deck extends ChangeNotifier {
+  List<PlayingCard> _deck;
+  List<PlayingCard> dealerHand = [];
+  List<PlayingCard> playerHand = [];
+
+  Deck() : _deck = _createAndShuffleDeck();
+
+  void resetDeckAndHands() {
+    _deck = [];
+    playerHand = [];
+    dealerHand = [];
+    _deck = _createAndShuffleDeck();
+    notifyListeners();
+  }
+
+  static List<PlayingCard> _createAndShuffleDeck() {
+    List<PlayingCard> deck = standardFiftyTwoCardDeck();
+    deck.shuffle();
+    return deck;
+  }
+
+  List<PlayingCard> getDeck() {
+    return _deck;
+  }
+
+  List<PlayingCard> getDealerHand() {
+    return dealerHand;
+  }
+
+  List<PlayingCard> getPlayerHand() {
+    return playerHand;
+  }
+
+  void shuffleDeck() {
+    _deck.shuffle();
+    notifyListeners();
+  }
+
+  void drawForDealer() {
+    if (_deck.isNotEmpty) {
+      PlayingCard poppedCard = _deck.removeLast();
+      notifyListeners();
+      dealerHand.add(poppedCard);
+    } else {
+      throw Exception("There are no cards in the deck to draw.");
+    }
+  }
+
+  void drawForPlayer() {
+    if (_deck.isNotEmpty) {
+      PlayingCard poppedCard = _deck.removeLast();
+      notifyListeners();
+      playerHand.add(poppedCard);
+    } else {
+      throw Exception("There are no cards in the deck to draw.");
+    }
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -45,33 +108,71 @@ class BlackjackHome extends StatefulWidget {
 }
 
 class _BlackjackHomeState extends State<BlackjackHome> {
-  List<PlayingCard> deck = standardFiftyTwoCardDeck();
-
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
       return Scaffold(
           body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text("Player hand"),
             Row(children: [
               Expanded(
                   child: SizedBox(
                 height: 150.0,
-                child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: deck
-                        .map(
-                          (card) => SizedBox(
-                            width: 100.0,
-                            height: 150.0,
-                            child: PlayingCardView(card: card),
-                          ),
-                        )
-                        .toList()),
+                child: Consumer<Deck>(builder: (context, deck, child) {
+                  return ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: deck
+                          .getPlayerHand()
+                          .map(
+                            (card) => SizedBox(
+                              width: 100.0,
+                              height: 150.0,
+                              child: PlayingCardView(card: card),
+                            ),
+                          )
+                          .toList());
+                }),
               )),
             ]),
+            Text("Dealer hand"),
+            Row(children: [
+              Expanded(
+                  child: SizedBox(
+                height: 150.0,
+                child: Consumer<Deck>(builder: (context, deck, child) {
+                  return ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: deck
+                          .getDealerHand()
+                          .map(
+                            (card) => SizedBox(
+                              width: 100.0,
+                              height: 150.0,
+                              child: PlayingCardView(card: card),
+                            ),
+                          )
+                          .toList());
+                }),
+              )),
+            ]),
+            Consumer<Deck>(builder: (context, deck, child) {
+              return TextButton(
+                  child: Text('draw card'),
+                  onPressed: () {
+                    deck.drawForPlayer();
+                  });
+            }),
+            Consumer<Deck>(builder: (context, deck, child) {
+              return TextButton(
+                  child: Text('Reset Deck'),
+                  onPressed: () {
+                    deck.resetDeckAndHands();
+                  });
+            }),
           ],
         ),
       ));
