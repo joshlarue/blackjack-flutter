@@ -68,4 +68,10 @@ class Deck extends ChangeNotifier {
       throw Exception("There are no cards in the deck to draw.");
     }
   }
+
+  void determineGameResult() {
+    for (PlayingCard card in playerHand) {
+      print(card.value);
+    }
+  }
 }
